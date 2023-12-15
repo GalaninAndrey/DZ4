@@ -1,0 +1,87 @@
+using System;
+using System.Collections.Generic;
+using System.Xml.Linq;
+
+namespace TaskM
+{
+    delegate void Update(Task task);
+    class Task
+    {
+        public Update up;
+        public string Name;
+        public string Description;
+        public bool Status;
+
+        public Task(string name, string description, bool status)
+        {
+            Name = name;
+            Description = description;
+            Status = status;
+        }
+    }
+
+    class TaskManager
+    {
+
+        public Task AddTask(string name, string description, bool status)
+        {
+            Task task = new Task(name, description, status);
+            return task;
+        }
+
+        public void CompleteTask(Task task)
+        {
+            task.Status = true;
+            RandomClass rc = new RandomClass();
+
+            task.up = rc.TaskCompletedNotification;
+
+            task.up(task);
+        }
+
+        public void DeleteTask(in List<Task> tasks, Task task) => tasks.Remove(task);
+
+    }
+
+
+    class RandomClass 
+    {
+        public void TaskCompletedNotification(Task task) => Console.WriteLine($"Задача под названием:{task.Name} выполнена");
+    }
+
+
+    class Program 
+    {
+        static void Main()
+        {
+            List<Task> tasks = new List<Task>();
+
+            TaskManager manager = new TaskManager();
+
+            Task task1 = manager.AddTask("Задача1", "Погулять с собакой", false);
+            Task task2 = manager.AddTask("Задача2", "Пообедать", false);
+
+            tasks.Add(task1);
+            tasks.Add(task2);
+
+            foreach (Task task in tasks)
+            {
+                Console.WriteLine($"Статус задачи :{task.Name} = {task.Status}");
+            }
+
+            manager.CompleteTask(task1);
+
+            foreach (Task task in tasks)
+            {
+                Console.WriteLine($"Статус задачи :{task.Name} = {task.Status}");
+            }
+
+            manager.DeleteTask(in tasks, task1);
+
+            foreach (Task task in tasks)
+            {
+                Console.WriteLine($"Статус задачи :{task.Name} = {task.Status}");
+            }
+        }
+    }
+}
